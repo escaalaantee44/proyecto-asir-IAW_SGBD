@@ -32,6 +32,7 @@ if ($rol == "admin") {
              FROM reservas_hoy
              ORDER BY fecha DESC, hora_inicio DESC";
     $stmt = $conn->prepare($sql);
+
 } else {
     // Usuario normal → solo ve SUS PROPIAS reservas de hoy.
     // El WHERE filtra por id_usuario para que, aunque manipule la sesión,
@@ -89,145 +90,148 @@ include "includes/header.php";
         </h2>
     </div>
 
+    <!-- Grupo derecho: botón Nueva reserva -->
+    <a href="reserva_nueva.php" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nueva reserva
+    </a>
+</div>
 
-
-
-    <!-- ══════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════
      TABLA DE RESERVAS DE HOY
 ══════════════════════════════════════════════ -->
 
-    <div class="card">
-        <div class="card-body p-0">
-            <!-- p-0 → la tabla llega al borde de la tarjeta sin padding extra -->
+<div class="card">
+    <div class="card-body p-0">
+        <!-- p-0 → la tabla llega al borde de la tarjeta sin padding extra -->
 
-            <div class="table-responsive">
-                <!-- table-responsive → scroll horizontal en móvil si la tabla no cabe -->
+        <div class="table-responsive">
+            <!-- table-responsive → scroll horizontal en móvil si la tabla no cabe -->
 
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
 
-                            <th class="d-none d-md-table-cell">Usuario</th>
-                            <!--
+                        <th class="d-none d-md-table-cell">Usuario</th>
+                        <!--
                             Oculta en móvil, visible desde tablet (md = ≥768 px).
                             Los admins la usan para saber quién hizo cada reserva.
                             Los usuarios normales siempre verán su propio nombre.
                         -->
 
-                            <th>Recurso</th>
-                            <th>Fecha</th>
+                        <th>Recurso</th>
+                        <th>Fecha</th>
 
-                            <th class="d-none d-sm-table-cell">Horario</th>
-                            <!--
+                        <th class="d-none d-sm-table-cell">Horario</th>
+                        <!--
                             Oculta en móvil pequeño, visible desde sm (≥576 px).
                             "HH:MM – HH:MM" ocupa bastante espacio horizontal.
                         -->
 
-                            <th class="text-end">Acciones</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($result->num_rows === 0): ?>
+                        <!-- Si no hay reservas hoy, se muestra un mensaje en lugar de la tabla vacía -->
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
+                                No hay reservas para hoy.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result->num_rows === 0): ?>
-                            <!-- Si no hay reservas hoy, se muestra un mensaje en lugar de la tabla vacía -->
+
+                    <?php else: ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <!-- Bucle: una iteración = una fila de la tabla = una reserva -->
+
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
-                                    No hay reservas para hoy.
+                                <td class="text-muted">
+                                    <?php echo $row["id_reserva"]; ?>
+                                    <!-- ID numérico en gris, menos prominente -->
                                 </td>
-                            </tr>
 
-                        <?php else: ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
-                                <!-- Bucle: una iteración = una fila de la tabla = una reserva -->
-
-                                <tr>
-                                    <td class="text-muted">
-                                        <?php echo $row["id_reserva"]; ?>
-                                        <!-- ID numérico en gris, menos prominente -->
-                                    </td>
-
-                                    <td class="d-none d-md-table-cell">
-                                        <?php echo htmlspecialchars($row["usuario"]); ?>
-                                        <!--
+                                <td class="d-none d-md-table-cell">
+                                    <?php echo htmlspecialchars($row["usuario"]); ?>
+                                    <!--
                                         Nombre del usuario (alias del JOIN en la vista).
                                         htmlspecialchars() protege contra XSS.
                                         Oculto en móvil (misma clase que el <th>).
                                     -->
-                                    </td>
+                                </td>
 
-                                    <td class="fw-semibold">
-                                        <?php echo htmlspecialchars($row["recurso"]); ?>
-                                        <!--
+                                <td class="fw-semibold">
+                                    <?php echo htmlspecialchars($row["recurso"]); ?>
+                                    <!--
                                         Nombre del recurso (alias del JOIN en la vista).
                                         fw-semibold → seminegrita, dato más relevante de la fila.
                                     -->
-                                    </td>
+                                </td>
 
-                                    <td><?php echo date("d/m/Y", strtotime($row["fecha"])); ?></td>
-                                    <!--
+                                <td><?php echo date("d/m/Y", strtotime($row["fecha"])); ?></td>
+                                <!--
                                     MySQL devuelve la fecha como "YYYY-MM-DD".
                                     strtotime() la convierte a timestamp Unix.
                                     date("d/m/Y") la reformatea a "DD/MM/YYYY" (más legible para el usuario).
                                 -->
 
-                                    <td class="d-none d-sm-table-cell text-muted" style="font-size:.85rem">
-                                        <!--
+                                <td class="d-none d-sm-table-cell text-muted" style="font-size:.85rem">
+                                    <!--
                                         Oculto en móvil pequeño. text-muted → gris.
                                         font-size:.85rem → ligeramente más pequeño para que quepa.
                                     -->
-                                        <?php echo substr($row["hora_inicio"], 0, 5); ?>
-                                        –
-                                        <?php echo substr($row["hora_fin"], 0, 5); ?>
-                                        <!--
+                                    <?php echo substr($row["hora_inicio"], 0, 5); ?>
+                                    –
+                                    <?php echo substr($row["hora_fin"], 0, 5); ?>
+                                    <!--
                                         MySQL guarda las horas como "HH:MM:SS".
                                         substr(..., 0, 5) elimina los ":SS" finales → muestra "HH:MM".
                                         Resultado: "09:00 – 10:30"
                                     -->
-                                    </td>
+                                </td>
 
-                                    <td class="text-end">
-                                        <?php if ($rol == "admin" || $row["id_usuario"] == $id_usuario): ?>
-                                            <!--
+                                <td class="text-end">
+                                    <?php if ($rol == "admin" || $row["id_usuario"] == $id_usuario): ?>
+                                    <!--
                                         LÓGICA DE VISIBILIDAD DE ACCIONES:
                                         - Admin → puede editar/eliminar cualquier reserva.
                                         - Usuario normal → solo las suyas (compara id_usuario
                                           de la fila con el ID de sesión, no el nombre, para
                                           evitar colisiones entre usuarios con el mismo nombre).
                                     -->
-                                            <a href="reserva_editar.php?id=<?php echo $row["id_reserva"]; ?>"
-                                                class="btn btn-sm btn-outline-primary me-1">
-                                                <i class="bi bi-pencil"></i>
-                                                <span class="d-none d-sm-inline ms-1">Editar</span>
-                                                <!--
+                                        <a href="reserva_editar.php?id=<?php echo $row["id_reserva"]; ?>"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil"></i>
+                                            <span class="d-none d-sm-inline ms-1">Editar</span>
+                                            <!--
                                                 En móvil solo el icono (ahorra espacio).
                                                 En sm+ también el texto "Editar".
                                             -->
-                                            </a>
-                                            <a href="reserva_eliminar.php?id=<?php echo $row["id_reserva"]; ?>"
-                                                class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('¿Seguro que deseas cancelar esta reserva?');">
-                                                <i class="bi bi-trash"></i>
-                                                <span class="d-none d-sm-inline ms-1">Eliminar</span>
-                                            </a>
-                                            <!--
+                                        </a>
+                                        <a href="reserva_eliminar.php?id=<?php echo $row["id_reserva"]; ?>"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('¿Seguro que deseas cancelar esta reserva?');">
+                                            <i class="bi bi-trash"></i>
+                                            <span class="d-none d-sm-inline ms-1">Eliminar</span>
+                                        </a>
+                                        <!--
                                             onclick confirm() → diálogo de confirmación nativo.
                                             Si el usuario cancela → return false → no navega
                                             a reserva_eliminar.php y la reserva se conserva.
                                         -->
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <?php include "includes/footer.php"; ?>
-    <!--
+<?php include "includes/footer.php"; ?>
+<!--
     Inserta el footer.php: cierra el </div> del container, muestra el pie de página
     con el copyright, carga el JS de Bootstrap y cierra </body> y </html>
 -->
