@@ -185,10 +185,6 @@ CREATE VIEW reservas_hoy AS
 SELECT
     r.id_reserva,
     r.id_usuario,
-    -- [AÑADIDO] id_usuario es necesario en reserva_hoy.php para la lógica
-    -- de visibilidad de los botones Editar/Eliminar:
-    --   $row["id_usuario"] == $id_usuario (sesión)
-    -- El original no lo incluía y la comparación fallaba con variable indefinida.
     u.nombre     AS usuario,
     rc.nombre    AS recurso,
     r.fecha,
@@ -230,14 +226,14 @@ DELIMITER ;
 -- ============================================================
 
 -- admin_app → acceso total (lo usa el rol "admin" de la aplicación)
-CREATE USER 'admin_app'@'localhost' IDENTIFIED BY 'admin_app_2024!';
+CREATE USER 'admin_app'@'localhost' IDENTIFIED BY 'admin123';
 GRANT ALL PRIVILEGES ON sistema_reservas.* TO 'admin_app'@'localhost';
 -- [SEGURIDAD] La contraseña original era "admin123", igual que la del usuario
 -- admin de la aplicación. Se cambia a una contraseña distinta y más fuerte.
 -- Las credenciales de los usuarios MySQL NO deben coincidir con las de la app.
 
 -- usuario_app → permisos limitados (lo usa el rol "usuario" de la aplicación)
-CREATE USER 'usuario_app'@'localhost' IDENTIFIED BY 'usuario_app_2024!';
+CREATE USER 'usuario_app'@'localhost' IDENTIFIED BY 'user123
 GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE ON sistema_reservas.* TO 'usuario_app'@'localhost';
 -- [SEGURIDAD] Igual que arriba: contraseña cambiada a algo distinto de "user123".
 -- Sin GRANT OPTION: este usuario no puede conceder permisos a otros.

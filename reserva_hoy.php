@@ -17,7 +17,7 @@ if (!isset($_SESSION["id_usuario"])) {
 // ── VARIABLES DE SESIÓN ───────────────────────────────────────────────────────
 
 $id_usuario = $_SESSION["id_usuario"];
-$rol        = $_SESSION["rol"];
+$rol        = $_SESSION["rol"]; 
 // Se guardan en variables cortas para no repetir $_SESSION["..."] en toda la página.
 
 // ── CONEXIÓN Y QUERY ──────────────────────────────────────────────────────────
