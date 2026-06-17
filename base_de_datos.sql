@@ -80,7 +80,6 @@ CREATE TABLE recursos (
     nombre       VARCHAR(100) NOT NULL,
     descripcion  TEXT,
     capacidad    INT DEFAULT 1,
-    estado       ENUM('activo','inactivo') DEFAULT 'activo',
     id_categoria INT NOT NULL,
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
         ON DELETE RESTRICT
