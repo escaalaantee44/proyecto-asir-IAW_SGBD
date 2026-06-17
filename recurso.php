@@ -113,7 +113,7 @@ $result = $conn->query($sql);
             <th>Categoría</th>
             <!-- El nombre de la categoría viene del JOIN: c.nombre AS categoria -->
             <th>Capacidad</th>
-            <th>Estado</th>
+            
             <th style="width: 150px;">Acciones</th>
             <!--
                 style="width: 150px;" → fija el ancho de la columna de acciones
@@ -150,13 +150,7 @@ $result = $conn->query($sql);
                 <td><?php echo $row["capacidad"]; ?></td>
                 <!-- Número de personas/unidades que admite el recurso. Es un número, sin XSS. -->
 
-                <td><?php echo $row["estado"]; ?></td>
-                <!--
-                Estado del recurso (ej: "disponible", "mantenimiento"...).
-                NOTA: aquí no se aplica htmlspecialchars, aunque sería recomendable
-                si el estado pudiera contener caracteres especiales.
-                En la práctica el estado viene de un campo controlado de la BD.
-            -->
+             
 
                 <td>
                     <!-- Botón EDITAR -->
